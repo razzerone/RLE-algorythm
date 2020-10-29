@@ -3,8 +3,6 @@ let arg = process.argv;
 let i = 0, n = 1;
 let resultString = '';
 
-//node RLE.js input.txt code/decode output.txt
-
 
 if (arg[3] == 'code') {
 	fs.readFile(arg[2], (err, data) => {
@@ -25,13 +23,18 @@ if (arg[3] == 'code') {
 				n++;
 			let nJump = n;
 
-			while (n > 0)
-			if (n < 3) {
-				resultString += inText.charAt(i);
-				n--;
-			} else {
-				resultString += '#' + String.fromCharCode(n % 128) + inText.charAt(i);
-				n -= n % 128;
+
+			while (n > 0) {
+				if (n < 3 && inText.charAt(i) != '#') {
+					resultString += inText.charAt(i) * n;
+					break;
+				} else if (n > 127){
+					resultString += '#' + String.fromCharCode(127) + inText.charAt(i);
+					n -= 127;
+				} else {
+					resultString += '#' + String.fromCharCode(n) + inText.charAt(i);
+					break;
+				}
 			}
 
 			i += nJump;
@@ -62,8 +65,7 @@ if (arg[3] == 'code') {
 
 		while (i < inText.length){
 			if (inText.charAt(i) == '#'){
-				for (k = 0; k < inText.charCodeAt(i + 1); k++)
-					resultString += inText.charAt(i + 2);
+				resultString += inText.charAt(i + 2) * inText.charCodeAt(i + 1);
 				i += 3;
 			} else {
 				resultString += inText.charAt(i);
